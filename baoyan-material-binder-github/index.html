@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>保研网申装订引擎</title>
+<script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+:root{--bg:#f8f2e8;--card:#fffaf3;--white:#fff;--line:#eadccb;--ink:#25211d;--muted:#74695d;--blue:#4169e1;--green:#20a35b;--red:#c8435d;--gold:#d39655;--shadow:0 14px 34px rgba(82,56,31,.10);--r:18px}*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#fcf8f2,#f4ebdf);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink)}.wrap{max-width:1180px;margin:0 auto;padding:26px 18px 56px}.top{display:flex;justify-content:space-between;gap:16px;align-items:center}.brand{display:flex;gap:12px;align-items:center}.logo{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#7c4a2d,#d39655);position:relative;box-shadow:var(--shadow)}.logo:after{content:"";position:absolute;inset:11px;border:2px solid #fff;border-radius:7px;transform:rotate(45deg)}h1{margin:0;font-size:25px}.sub{font-size:13px;color:var(--muted);margin-top:4px}.btn{border:0;border-radius:12px;padding:10px 14px;font-weight:800;cursor:pointer;background:#eee;color:#333;box-shadow:0 5px 14px rgba(0,0,0,.06)}.btn:hover{transform:translateY(-1px)}.btn.primary{background:var(--blue);color:#fff}.btn.green{background:var(--green);color:#fff}.btn.gold{background:var(--gold);color:#fff}.btn.red{background:var(--red);color:#fff}.btn.ghost{background:#fff;border:1px solid var(--line);box-shadow:none}.btn:disabled{opacity:.55;cursor:not-allowed;transform:none}.panel{margin-top:16px;padding:18px;background:rgba(255,250,243,.92);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}.head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}.head h2{margin:0;font-size:19px}.hint{font-size:12px;color:var(--muted)}textarea,input{width:100%;border:1px solid #e2d4c2;border-radius:13px;background:#fff;padding:12px 13px;font-size:14px;outline:none}textarea:focus,input:focus{border-color:#c49155;box-shadow:0 0 0 4px rgba(211,150,85,.16)}textarea{min-height:128px;resize:vertical;line-height:1.65}.bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.field label{display:block;font-size:13px;font-weight:900;margin:0 0 7px;color:#5e4632}.status{margin-top:12px;padding:10px 12px;border-radius:12px;font-size:13px;background:#eef9f2;color:#13773f;border:1px solid #cfebda}.status.warn{background:#fff7e8;color:#8a5c13;border-color:#ecd8aa}.reqList{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px}.req{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;font-size:13px}.req strong{color:#60432c}.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;min-height:190px}.ct{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}.badge{font-size:12px;border-radius:999px;padding:3px 8px;background:#f2eee8;color:#6b5a48}.badge.ok{background:#e9f8ee;color:#148245}.drop{border:1.5px dashed #dfcab3;background:#fffdf9;border-radius:14px;min-height:76px;display:flex;align-items:center;justify-content:center;text-align:center;color:#8b785f;font-size:13px;cursor:pointer;padding:12px}.drop.drag{border-color:var(--blue);background:#eef3ff;color:#254fb6}.hidden{display:none}.files{list-style:none;padding:0;margin:10px 0 0;display:flex;flex-direction:column;gap:7px}.file{display:grid;grid-template-columns:26px 1fr auto;gap:8px;align-items:center;border:1px solid #eee4d6;background:#fffaf3;border-radius:12px;padding:7px 8px;font-size:12px}.fn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mini{border:0;background:#f3eadf;border-radius:8px;padding:4px 7px;cursor:pointer;font-weight:800}.mini.red{background:#ffe8ec;color:#b62d45}.mini.blue{background:#eaf0ff;color:#345bdc}.mini:disabled{opacity:.35;cursor:not-allowed}.tools{display:flex;gap:4px}.adder{display:grid;grid-template-columns:1fr auto;gap:10px}.switch{display:flex;border:1px solid var(--line);background:#fff;border-radius:14px;overflow:hidden}.switch button{border:0;background:#fff;padding:10px 13px;cursor:pointer;font-weight:900}.switch .active{background:#f0e4d5;color:#6d4027}.preview{padding:13px;border-left:4px solid var(--blue);background:#f8fbff;border-radius:12px;margin-top:10px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;word-break:break-all}.orderWrap{display:grid;grid-template-columns:1fr 330px;gap:16px}.order{display:grid;grid-template-columns:1fr 1fr;gap:9px}.ord{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;display:grid;grid-template-columns:32px 1fr auto;gap:8px;align-items:center}.ord.ok{background:#f0fbf4;border-color:#cfe8d6}.ord.miss{opacity:.58}.num{font-weight:900;color:#5865d8}.side{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px}.progress{height:10px;background:#eee5d8;border-radius:999px;overflow:hidden;margin-top:10px}.progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),#76a4ff);transition:.2s}.log{white-space:pre-wrap;background:#201b18;color:#f8ead8;border-radius:14px;padding:12px;font-size:12px;line-height:1.65;max-height:190px;overflow:auto}.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#1f1d1b;color:white;padding:11px 14px;border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.25);font-size:14px;display:none}.toast.show{display:block}@media(max-width:920px){.grid,.row3,.order{grid-template-columns:1fr 1fr}.orderWrap{grid-template-columns:1fr}}@media(max-width:650px){.grid,.row,.row3,.order,.adder{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top"><div class="brand"><div class="logo"></div><div><h1>保研网申装订引擎</h1><div class="sub">材料识别、分类归档、顺序微调、统一命名、PDF/ZIP 一键打包。所有文件均在浏览器本地处理。</div></div></div><div class="bar"><button class="btn ghost" id="saveDraft">保存草稿</button><button class="btn ghost" id="loadDraft">读取草稿</button><button class="btn red" id="clearAll">清空</button></div></header>
+<section class="panel"><div class="head"><h2>第一步：粘贴通知，一键识别材料清单</h2><span class="hint">粘贴招生通知/夏令营通知/预推免通知中的“申请材料”段落</span></div><textarea id="notice" placeholder="例：请提交本科成绩单、专业排名证明、英语四六级成绩单复印件、身份证复印件、学生证复印件、获奖证书、科研论文、专家推荐信、个人陈述、简历、研究计划等材料……"></textarea><div class="bar" style="margin-top:12px"><button class="btn primary" id="parseBtn">开始识别并生成清单</button><button class="btn ghost" id="demoBtn">填入示例通知</button><span class="hint">识别不到的条目可手动新增材料夹。</span></div><div id="parseStatus" class="status warn">尚未识别。也可以直接在第二步上传材料。</div><div id="reqList" class="reqList"></div></section>
+<section class="panel"><div class="head"><h2>第二步：固定档案柜</h2><span class="hint">上传一次，所有学校复用；PDF/JPG/PNG 可合并为单一 PDF</span></div><div class="adder"><input id="newCat" placeholder="新增自定义材料夹，如：思想政治考核表 / 诚信承诺书"><button class="btn gold" id="addCat">+ 新增材料夹</button></div><div id="cabinet" class="grid" style="margin-top:14px"></div><div class="status warn">文件已导入浏览器本地缓存，不会上传服务器。关闭网页前请生成打包文件；保存草稿只能保存分类结构和命名规则，不会保存文件本体。</div></section>
+<section class="panel"><div class="head"><h2>第三步：命名规则与打包格式</h2><span class="hint">未上传材料会被自动跳过，不进入最终装订</span></div><div class="row"><div class="field"><label>打包格式</label><div class="switch"><button id="modePdf" class="active">单一 PDF（推荐）</button><button id="modeZip">ZIP 压缩包（分散文件）</button></div></div><div class="field"><label>文件命名规则</label><input id="nameTpl" value="{学校}+{姓名}+夏令营报名"></div></div><div class="row3" style="margin-top:14px"><div class="field"><label>学校</label><input id="school" placeholder="如：上海大学"></div><div class="field"><label>姓名</label><input id="student" placeholder="如：程勋"></div><div class="field"><label>本科院校</label><input id="undergrad" placeholder="如：大连交通大学"></div><div class="field"><label>报考专业</label><input id="major" placeholder="如：机械工程"></div><div class="field"><label>年份</label><input id="year" placeholder="如：2026"></div><div class="field"><label>自定义字段</label><input id="custom" placeholder="如：优秀大学生"></div></div><div class="preview" id="filenamePreview"></div><div class="hint" style="margin-top:8px">可用占位符：{学校} {姓名} {本科院校} {报考专业} {年份} {自定义}</div></section>
+<section class="panel"><div class="head"><h2>第四步：章节顺序微调</h2><span class="hint">绿色表示已上传；灰色表示未上传，打包时自动跳过</span></div><div class="orderWrap"><div id="orderList" class="order"></div><aside class="side"><b>装订检查</b><div id="checkInfo" class="hint" style="margin-top:8px"></div><div class="progress"><span id="prog"></span></div><div class="bar" style="margin-top:14px"><button class="btn green" id="buildBtn">确认，立刻封卷！</button><button class="btn ghost" id="downloadConfig">导出配置</button></div><div class="hint" style="margin-top:10px;line-height:1.6">PDF 合并顺序按章节序号排列；每个材料夹内部按照文件列表顺序排列，可在卡片内用 ↑ ↓ 调整。</div></aside></div></section>
+<section class="panel"><div class="head"><h2>运行日志</h2><span class="hint">生成失败时先看这里，常见原因是 PDF 加密或上传了 Word/Excel 等非 PDF/图片文件。</span></div><div id="log" class="log">系统就绪。</div></section>
+</div><div id="toast" class="toast"></div>
+<script>
+const CATS_BASE=[{id:'application',name:'申请表',keys:['申请表','报名表','申请书']},{id:'transcript',name:'本科成绩单',keys:['成绩单','本科成绩','学习成绩']},{id:'ranking',name:'专业排名证明',keys:['排名','专业排名','排名证明','综合排名']},{id:'english',name:'英语水平证明',keys:['英语','六级','四级','CET','雅思','托福','TOEFL','IELTS']},{id:'idcard',name:'身份证正反面',keys:['身份证','居民身份证']},{id:'studentcard',name:'学生证 / 学籍证明',keys:['学生证','学籍','在读证明']},{id:'awards',name:'获奖证书',keys:['获奖','证书','竞赛','奖项','荣誉']},{id:'research',name:'科研材料 / 论文',keys:['科研','论文','专利','项目','成果','发表']},{id:'recommend',name:'专家推荐信',keys:['推荐信','专家推荐','导师推荐']},{id:'statement',name:'个人陈述',keys:['个人陈述','自述','个人简介']},{id:'resume',name:'简历',keys:['简历','CV','个人简历']},{id:'plan',name:'研究计划',keys:['研究计划','研修计划','学习计划']},{id:'political',name:'政审表 / 思政考核',keys:['政审','思想政治','政治审查','现实表现']},{id:'promise',name:'诚信承诺书',keys:['诚信','承诺书']},{id:'other',name:'杂项材料',keys:['其他','补充材料','附件']}];
+let state={cats:CATS_BASE.map(c=>({...c,files:[]})),order:CATS_BASE.map(c=>c.id),mode:'pdf'};
+const $=id=>document.getElementById(id);function cat(id){return state.cats.find(c=>c.id===id)}function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1800)}function log(t){$('log').textContent=t+'\n'+$('log').textContent}function clean(s){return(s||'').replace(/[\\/:*?"<>|]/g,'-').replace(/\s+/g,'').trim()||'未命名'}
+function renderCabinet(){const box=$('cabinet');box.innerHTML='';state.cats.forEach(c=>{const card=document.createElement('div');card.className='card';card.innerHTML=`<div class="ct"><b>${c.name}</b><span class="badge ${c.files.length?'ok':''}">${c.files.length?c.files.length+' 个文件':'待上传'}</span></div><div class="drop" data-id="${c.id}">📁<br>PDF / 图片均可，可多选排序</div><input class="hidden fileInput" data-id="${c.id}" type="file" multiple accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/png,image/jpeg"><ul class="files">${c.files.map((f,i)=>`<li class="file"><b>${i+1}</b><span class="fn" title="${f.name}">${f.name}<br><span class="hint">${(f.size/1024).toFixed(1)} KB</span></span><span class="tools"><button class="mini blue" data-act="up" data-id="${c.id}" data-i="${i}" ${i===0?'disabled':''}>↑</button><button class="mini blue" data-act="down" data-id="${c.id}" data-i="${i}" ${i===c.files.length-1?'disabled':''}>↓</button><button class="mini red" data-act="del" data-id="${c.id}" data-i="${i}">×</button></span></li>`).join('')}</ul><div class="hint" style="margin-top:8px">内部顺序会保留到最终装订。</div>`;box.appendChild(card)});bindUpload();renderOrder();updateName()}
+function bindUpload(){document.querySelectorAll('.drop').forEach(d=>{const id=d.dataset.id,inp=document.querySelector(`.fileInput[data-id="${id}"]`);d.onclick=()=>inp.click();d.ondragover=e=>{e.preventDefault();d.classList.add('drag')};d.ondragleave=()=>d.classList.remove('drag');d.ondrop=e=>{e.preventDefault();d.classList.remove('drag');addFiles(id,[...e.dataTransfer.files])};inp.onchange=e=>addFiles(id,[...e.target.files])});document.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>fileAction(b.dataset.act,b.dataset.id,+b.dataset.i))}
+function addFiles(id,files){const c=cat(id),ok=files.filter(f=>/pdf|png|jpe?g/i.test(f.type)||/\.(pdf|png|jpe?g)$/i.test(f.name));const bad=files.length-ok.length;c.files.push(...ok);if(bad)toast(`已跳过 ${bad} 个暂不支持文件`);renderCabinet();log(`导入 ${c.name}：${ok.map(f=>f.name).join('、')||'无可用文件'}`)}
+function fileAction(a,id,i){const arr=cat(id).files;if(a==='del')arr.splice(i,1);if(a==='up'&&i>0)[arr[i-1],arr[i]]=[arr[i],arr[i-1]];if(a==='down'&&i<arr.length-1)[arr[i+1],arr[i]]=[arr[i],arr[i+1]];renderCabinet()}
+function renderOrder(){const box=$('orderList');box.innerHTML='';state.order.forEach((id,i)=>{const c=cat(id);if(!c)return;const ok=c.files.length>0;const div=document.createElement('div');div.className='ord '+(ok?'ok':'miss');div.innerHTML=`<span class="num">${i+1}</span><div><b>${c.name}</b><br><span class="hint">${ok?c.files.length+' 份文件':'未上传，自动跳过'}</span></div><span class="tools"><button class="mini" data-o="up" data-id="${id}" ${i===0?'disabled':''}>▲</button><button class="mini" data-o="down" data-id="${id}" ${i===state.order.length-1?'disabled':''}>▼</button></span>`;box.appendChild(div)});document.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>moveOrder(b.dataset.o,b.dataset.id));const uploaded=state.cats.filter(c=>c.files.length).length,files=state.cats.reduce((s,c)=>s+c.files.length,0);$('checkInfo').innerHTML=`已上传 <b>${uploaded}</b> 个材料夹，共 <b>${files}</b> 个文件。最终会跳过空材料夹。`;$('prog').style.width=Math.round(uploaded/state.cats.length*100)+'%'}
+function moveOrder(a,id){const i=state.order.indexOf(id);if(a==='up'&&i>0)[state.order[i-1],state.order[i]]=[state.order[i],state.order[i-1]];if(a==='down'&&i<state.order.length-1)[state.order[i+1],state.order[i]]=[state.order[i],state.order[i+1]];renderOrder()}
+function parseNotice(){const text=$('notice').value.trim();if(!text){toast('请先粘贴通知内容');return}const hits=[];state.cats.forEach(c=>{if(c.id==='other')return;if(c.keys.some(k=>text.toLowerCase().includes(k.toLowerCase())))hits.push(c)});$('reqList').innerHTML='';hits.forEach((c,i)=>{const d=document.createElement('div');d.className='req';d.innerHTML=`<strong>${i+1}. ${c.name}</strong><br><span class="hint">关键词：${c.keys.filter(k=>text.toLowerCase().includes(k.toLowerCase())).slice(0,3).join(' / ')}</span>`;$('reqList').appendChild(d)});$('parseStatus').className='status';$('parseStatus').innerHTML=`识别成功：检测到 <b>${hits.length}</b> 个常见材料项。建议优先上传：${hits.map(h=>h.name).join('、')||'暂无'}`;const ids=hits.map(h=>h.id);state.order=[...ids,...state.order.filter(id=>!ids.includes(id))];renderOrder();log('材料清单识别完成：'+hits.map(h=>h.name).join('、'))}
+function updateName(){const m={学校:$('school').value,姓名:$('student').value,本科院校:$('undergrad').value,报考专业:$('major').value,年份:$('year').value,自定义:$('custom').value};let n=$('nameTpl').value||'{学校}+{姓名}+夏令营报名';Object.entries(m).forEach(([k,v])=>n=n.replaceAll('{'+k+'}',v||k));$('filenamePreview').textContent='预览：'+clean(n)+(state.mode==='pdf'?'.pdf':'.zip')}
+async function fileBytes(f){return new Uint8Array(await f.arrayBuffer())}
+function fileKind(f,bytes){const name=(f.name||'').toLowerCase(),type=(f.type||'').toLowerCase();if(name.endsWith('.pdf')||type.includes('pdf'))return 'pdf';if(name.endsWith('.png')||type.includes('png'))return 'png';if(/\.(jpg|jpeg)$/.test(name)||type.includes('jpeg')||type.includes('jpg'))return 'jpg';if(bytes&&bytes[0]===0x25&&bytes[1]===0x50&&bytes[2]===0x44&&bytes[3]===0x46)return 'pdf';return 'unknown'}
+async function imagePage(pdf,bytes,kind,fileName){let img;if(kind==='png')img=await pdf.embedPng(bytes);else if(kind==='jpg')img=await pdf.embedJpg(bytes);else throw new Error('不支持的图片格式：'+fileName);const p=pdf.addPage([595.28,841.89]),margin=36,maxW=595.28-margin*2,maxH=841.89-margin*2,r=Math.min(maxW/img.width,maxH/img.height),w=img.width*r,h=img.height*r;p.drawImage(img,{x:(595.28-w)/2,y:(841.89-h)/2,width:w,height:h})}
+async function copyPdfDirect(out,bytes){
+ const {PDFDocument}=PDFLib;
+ const src=await PDFDocument.load(bytes,{ignoreEncryption:true,updateMetadata:false});
+ const idx=src.getPageIndices();
+ if(!idx.length)throw new Error('PDF 没有可复制页面');
+ const pages=await out.copyPages(src,idx);
+ let n=0;
+ for(const p of pages){
+  if(!p)throw new Error('复制页面结果为空');
+  out.addPage(p);n++;
+ }
+ return n;
+}
+function initPdfJs(){
+ if(!window.pdfjsLib) throw new Error('PDF.js 未加载，无法启用渲染兜底');
+ if(pdfjsLib.GlobalWorkerOptions && !pdfjsLib.GlobalWorkerOptions.workerSrc){
+  pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+ }
+}
+function canvasToPngBytes(canvas){
+ return new Promise((resolve,reject)=>{
+  canvas.toBlob(blob=>{
+   if(!blob){reject(new Error('Canvas 转图片失败'));return;}
+   const reader=new FileReader();
+   reader.onload=()=>resolve(new Uint8Array(reader.result));
+   reader.onerror=()=>reject(new Error('读取渲染图片失败'));
+   reader.readAsArrayBuffer(blob);
+  },'image/png',0.95);
+ });
+}
+async function renderPdfFallback(out,bytes,fileName){
+ initPdfJs();
+ const task=pdfjsLib.getDocument({data:bytes.slice(0),useSystemFonts:true,disableFontFace:false});
+ const doc=await task.promise;
+ let n=0;
+ for(let i=1;i<=doc.numPages;i++){
+  log('兜底渲染：'+fileName+' 第 '+i+'/'+doc.numPages+' 页');
+  const page=await doc.getPage(i);
+  const viewport=page.getViewport({scale:2});
+  const canvas=document.createElement('canvas');
+  canvas.width=Math.ceil(viewport.width);
+  canvas.height=Math.ceil(viewport.height);
+  const ctx=canvas.getContext('2d',{alpha:false});
+  await page.render({canvasContext:ctx,viewport}).promise;
+  const pngBytes=await canvasToPngBytes(canvas);
+  const img=await out.embedPng(pngBytes);
+  const pdfPage=out.addPage([595.28,841.89]);
+  const margin=24,maxW=595.28-margin*2,maxH=841.89-margin*2;
+  const r=Math.min(maxW/img.width,maxH/img.height);
+  const w=img.width*r,h=img.height*r;
+  pdfPage.drawImage(img,{x:(595.28-w)/2,y:(841.89-h)/2,width:w,height:h});
+  canvas.width=1;canvas.height=1;n++;
+ }
+ try{await doc.destroy()}catch(e){}
+ return n;
+}
+async function buildPdf(){
+ const {PDFDocument}=PDFLib;
+ const out=await PDFDocument.create();
+ let totalPages=0;
+ for(const id of state.order){
+  const c=cat(id);if(!c||!c.files.length)continue;
+  for(const f of c.files){
+   log('正在处理：'+c.name+' / '+f.name);
+   try{
+    const b=await fileBytes(f);
+    const kind=fileKind(f,b);
+    if(kind==='pdf'){
+     try{
+      const n=await copyPdfDirect(out,b);
+      totalPages+=n;
+     }catch(directErr){
+      log('直接复制失败，自动改用图片渲染兜底：'+f.name+'；原因：'+(directErr&&directErr.message?directErr.message:directErr));
+      try{
+       const n=await renderPdfFallback(out,b,f.name);
+       totalPages+=n;
+       log('兜底成功：'+f.name+' 已按图片页写入。');
+      }catch(fallbackErr){
+       throw new Error('直接复制失败：'+(directErr&&directErr.message?directErr.message:directErr)+'；渲染兜底也失败：'+(fallbackErr&&fallbackErr.message?fallbackErr.message:fallbackErr));
+      }
+     }
+    }else if(kind==='png'||kind==='jpg'){
+     await imagePage(out,b,kind,f.name);totalPages++;
+    }else{
+     throw new Error('仅支持 PDF、JPG、PNG');
+    }
+   }catch(err){
+    throw new Error('文件解析失败：'+c.name+' / '+f.name+'。原因：'+(err&&err.message?err.message:err));
+   }
+  }
+ }
+ if(totalPages===0)throw new Error('没有成功合并任何页面');
+ return await out.save();
+}
+async function buildZip(){const zip=new JSZip();let n=1;for(const id of state.order){const c=cat(id);if(!c||!c.files.length)continue;const folder=zip.folder(String(n).padStart(2,'0')+'_'+c.name.replace(/[\\/:*?"<>|]/g,'-'));let i=1;for(const f of c.files){folder.file(String(i).padStart(2,'0')+'_'+f.name,await f.arrayBuffer());i++}n++}return await zip.generateAsync({type:'uint8array'})}
+function fname(){const m={学校:$('school').value,姓名:$('student').value,本科院校:$('undergrad').value,报考专业:$('major').value,年份:$('year').value,自定义:$('custom').value};let n=$('nameTpl').value||'{学校}+{姓名}+夏令营报名';Object.entries(m).forEach(([k,v])=>n=n.replaceAll('{'+k+'}',v||''));return clean(n)+(state.mode==='pdf'?'.pdf':'.zip')}
+function dl(bytes,name,type){const blob=new Blob([bytes],{type}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+async function build(){if(!state.cats.some(c=>c.files.length)){toast('请先上传至少一个文件');return}$('buildBtn').disabled=true;log('开始封卷……');try{if(state.mode==='pdf'){const b=await buildPdf();dl(b,fname(),'application/pdf');log('单一 PDF 已生成：'+fname())}else{const b=await buildZip();dl(b,fname(),'application/zip');log('ZIP 压缩包已生成：'+fname())}toast('生成完成')}catch(e){console.error(e);log('生成失败：'+e.message+'\n建议：查看上一行“正在处理”的文件名；若某个 PDF 失败，请用浏览器或 Adobe 打开后重新打印/另存为 PDF，再上传；Word/Excel/PPT 请先另存为 PDF。也可临时切换为 ZIP 压缩包模式。');toast('生成失败，请查看日志')}finally{$('buildBtn').disabled=false}}
+function saveDraft(){const d={cats:state.cats.map(c=>({id:c.id,name:c.name,keys:c.keys,files:[]})),order:state.order,mode:state.mode,notice:$('notice').value,nameTpl:$('nameTpl').value,school:$('school').value,student:$('student').value,undergrad:$('undergrad').value,major:$('major').value,year:$('year').value,custom:$('custom').value};localStorage.setItem('baoyanBinderDraft',JSON.stringify(d));toast('草稿已保存');log('已保存草稿。注意：浏览器不会长期保存文件本体。')}
+function loadDraft(){const raw=localStorage.getItem('baoyanBinderDraft');if(!raw){toast('没有找到草稿');return}const d=JSON.parse(raw);state.cats=d.cats.map(c=>({...c,files:[]}));state.order=d.order;state.mode=d.mode||'pdf';['notice','nameTpl','school','student','undergrad','major','year','custom'].forEach(k=>$(k).value=d[k]||'');$('modePdf').classList.toggle('active',state.mode==='pdf');$('modeZip').classList.toggle('active',state.mode==='zip');renderCabinet();toast('草稿已读取，请重新上传文件')}
+$('parseBtn').onclick=parseNotice;$('demoBtn').onclick=()=>{$('notice').value='1. 申请表；2. 本科阶段成绩单；3. 专业排名证明；4. 英语四六级成绩单复印件；5. 身份证复印件；6. 学生证复印件；7. 获奖证书及科研论文；8. 两封专家推荐信；9. 个人陈述、简历和研究计划。上传材料请按学校+姓名+夏令营报名命名，合并为一个PDF文件。';parseNotice()};$('addCat').onclick=()=>{const name=$('newCat').value.trim();if(!name)return;const id='custom_'+Date.now();state.cats.push({id,name,keys:[name],files:[]});state.order.push(id);$('newCat').value='';renderCabinet()};$('modePdf').onclick=()=>{state.mode='pdf';$('modePdf').classList.add('active');$('modeZip').classList.remove('active');updateName()};$('modeZip').onclick=()=>{state.mode='zip';$('modeZip').classList.add('active');$('modePdf').classList.remove('active');updateName()};['nameTpl','school','student','undergrad','major','year','custom'].forEach(id=>$(id).addEventListener('input',updateName));$('buildBtn').onclick=build;$('saveDraft').onclick=saveDraft;$('loadDraft').onclick=loadDraft;$('downloadConfig').onclick=()=>{const cfg={categories:state.order.map(id=>{const c=cat(id);return{name:c.name,uploadedFiles:c.files.map(f=>f.name)}}),mode:state.mode,filenamePreview:$('filenamePreview').textContent,time:new Date().toLocaleString()};dl(new TextEncoder().encode(JSON.stringify(cfg,null,2)),'保研材料装订配置.json','application/json')};$('clearAll').onclick=()=>{if(confirm('确认清空所有分类与文件？')){state={cats:CATS_BASE.map(c=>({...c,files:[]})),order:CATS_BASE.map(c=>c.id),mode:'pdf'};$('notice').value='';$('reqList').innerHTML='';renderCabinet();toast('已清空')}};renderCabinet();updateName();
+</script>
+</body>
+</html>
