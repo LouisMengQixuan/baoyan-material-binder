@@ -66,6 +66,5 @@
 - 多学校、多命名规则材料打包
 - 竞赛、奖学金、科研材料统一归档
 
-## License
-
-MIT License
+## 联系我
+若有问题，请邮件联系louismengqixuan@gmail.com或louismengqixuan@163.com
